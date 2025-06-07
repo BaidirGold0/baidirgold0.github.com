@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Baidir Gold - Panier de vos bijoux en or 24k, commandez facilement via WhatsApp !" />
+  <title>Panier - Baidir Gold</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --or: #d4af37;
+      --noir: #111;
+      --blanc: #fff;
+      --gris: #f4f4f4;
+      --texte: #222;
+    }body {
+  font-family: 'Times New Roman', serif;
+  margin: 0;
+  background: #fff8e7;
+  color: var(--texte);
+}
+
+header {
+  background-color: #c59d5f;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.logo {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.contenu {
+  padding: 20px;
+}
+
+h1 {
+  color: var(--or);
+}
+
+.produit {
+  display: flex;
+  align-items: center;
+  background: var(--gris);
+  margin: 10px 0;
+  border-radius: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+}
+
+.produit img {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.produit-info {
+  flex: 1;
+}
+
+.supprimer {
+  background: crimson;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#total {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 20px;
+}
+
+.commande {
+  margin-top: 30px;
+}
+
+.commande a button {
+  background-color: #25d366;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9em;
+  background: #eee;
+  margin-top: 40px;
+}
+
+@media screen and (max-width: 600px) {
+  .produit {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .produit img {
+    margin-bottom: 10px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Baidir Gold</div>
+    <a href="index.html" style="color: white;">Accueil</a>
+  </header>  <div class="contenu">
+    <h1>Votre Panier</h1>
+    <div id="liste-panier"></div>
+    <div id="total"></div>
+    <div class="commande" id="whatsapp-commande"></div>
+  </div>  <footer>
+    &copy; 2025 Baidir Gold. Tous droits réservés.
+  </footer>  
+  
+  <script>
+  const tauxEuro = 0.92;
+  const panier = JSON.parse(localStorage.getItem('panier')) || {};
+
+  function afficherPanier() {
+    const container = document.getElementById('liste-panier');
+    container.innerHTML = '';
+    let total = 0;
+    let produitsText = [];
+
+    Object.entries(panier).forEach(([id, item]) => {
+      let prixTotal = 0;
+      let infoSupplementaire = '';
+      if (id === 'or21 et 22k') {
+        // Or : utiliser grammes
+        prixTotal = item.grammes * 62 * tauxEuro;
+        infoSupplementaire = `Quantité : ${item.grammes}g`;
+        produitsText.push(`${item.nom} - ${item.grammes}g = ${prixTotal.toFixed(2)}€`);
+      } else {
+        // Bijoux
+        prixTotal = item.quantite * (item.prix || 0) * tauxEuro;
+        infoSupplementaire = `Quantité : ${item.quantite}`;
+        produitsText.push(`${item.nom} x${item.quantite} = ${prixTotal.toFixed(2)}€`);
+      }
+
+      total += prixTotal;
+
+      const div = document.createElement('div');
+      div.className = 'produit';
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.nom}" />
+        <div class="produit-info">
+          <strong>${item.nom}</strong><br>
+          ${infoSupplementaire}<br>
+          Prix : ${prixTotal.toFixed(2)} €
+        </div>
+        <button class="supprimer" onclick="supprimerProduit('${id}')">Supprimer</button>
+      `;
+      container.appendChild(div);
+    });
+
+    document.getElementById('total').textContent = `Total : ${total.toFixed(2)} €`;
+
+    const message = `Bonjour, je souhaite commander :%0A${produitsText.join('%0A')}%0ATotal : ${total.toFixed(2)}€`;
+    document.getElementById('whatsapp-commande').innerHTML = `
+      <a href="https://wa.me/33758738242?text=${message}" target="_blank">
+        <button>Commander via WhatsApp</button>
+      </a>
+    `;
+  }
+
+  function supprimerProduit(id) {
+    delete panier[id];
+    localStorage.setItem('panier', JSON.stringify(panier));
+    afficherPanier();
+  }
+
+  afficherPanier();
+</script>
+</body>
+</html>
